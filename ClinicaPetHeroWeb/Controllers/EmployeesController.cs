@@ -7,23 +7,34 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ClinicaPetHeroWeb.Data;
 using ClinicaPetHeroWeb.Data.Entities;
+using ClinicaPetHeroWeb.Data.Repos;
 
 namespace ClinicaPetHeroWeb.Controllers
 {
     public class EmployeesController : Controller
     {
-        private readonly DataContext _context;
+        private readonly IEmployeeRepository _employeeRepository;
 
-        public EmployeesController(DataContext context)
+        public EmployeesController(IEmployeeRepository employeeRepository)
         {
-            _context = context;
+            _employeeRepository = employeeRepository;
         }
+
+
+        // #######################################
+        // #                INDEX                #
+        // #######################################
 
         // GET: Employees
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return View(await _context.Employees.ToListAsync());
+            return View(_employeeRepository.GetAll().OrderBy(e => e.FirstName).ThenBy(o => o.LastName));
         }
+
+
+        // #########################################
+        // #                DETAILS                #
+        // #########################################
 
         // GET: Employees/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -33,8 +44,8 @@ namespace ClinicaPetHeroWeb.Controllers
                 return NotFound();
             }
 
-            var employee = await _context.Employees
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var employee = await _employeeRepository.GetByIdAsync(id.Value);
+
             if (employee == null)
             {
                 return NotFound();
@@ -42,6 +53,11 @@ namespace ClinicaPetHeroWeb.Controllers
 
             return View(employee);
         }
+
+
+        // ########################################
+        // #                CREATE                #
+        // ########################################
 
         // GET: Employees/Create
         public IActionResult Create()
@@ -54,16 +70,21 @@ namespace ClinicaPetHeroWeb.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Position,Id,FirstName,LastName,Gender,DateOfBirth,Address,City,State,PostalCode,Email,Phone")] Employee employee)
+        public async Task<IActionResult> Create(Employee employee)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(employee);
-                await _context.SaveChangesAsync();
+                await _employeeRepository.CreateAsync(employee);
+
                 return RedirectToAction(nameof(Index));
             }
             return View(employee);
         }
+
+
+        // ######################################
+        // #                EDIT                #
+        // ######################################
 
         // GET: Employees/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -73,11 +94,13 @@ namespace ClinicaPetHeroWeb.Controllers
                 return NotFound();
             }
 
-            var employee = await _context.Employees.FindAsync(id);
+            var employee = await _employeeRepository.GetByIdAsync(id.Value);
+
             if (employee == null)
             {
                 return NotFound();
             }
+
             return View(employee);
         }
 
@@ -86,7 +109,7 @@ namespace ClinicaPetHeroWeb.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Position,Id,FirstName,LastName,Gender,DateOfBirth,Address,City,State,PostalCode,Email,Phone")] Employee employee)
+        public async Task<IActionResult> Edit(int id, Employee employee)
         {
             if (id != employee.Id)
             {
@@ -97,12 +120,11 @@ namespace ClinicaPetHeroWeb.Controllers
             {
                 try
                 {
-                    _context.Update(employee);
-                    await _context.SaveChangesAsync();
+                    await _employeeRepository.UpdateAsync(employee);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!EmployeeExists(employee.Id))
+                    if (! await _employeeRepository.ExistsAsync(employee.Id))
                     {
                         return NotFound();
                     }
@@ -111,10 +133,17 @@ namespace ClinicaPetHeroWeb.Controllers
                         throw;
                     }
                 }
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(employee);
         }
+
+
+        // ########################################
+        // #                DELETE                #
+        // ########################################
 
         // GET: Employees/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -124,8 +153,8 @@ namespace ClinicaPetHeroWeb.Controllers
                 return NotFound();
             }
 
-            var employee = await _context.Employees
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var employee = await _employeeRepository.GetByIdAsync(id.Value);
+
             if (employee == null)
             {
                 return NotFound();
@@ -139,15 +168,11 @@ namespace ClinicaPetHeroWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var employee = await _context.Employees.FindAsync(id);
-            _context.Employees.Remove(employee);
-            await _context.SaveChangesAsync();
+            var employee = await _employeeRepository.GetByIdAsync(id);
+            
+            await _employeeRepository.DeleteAsync(employee);
+            
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool EmployeeExists(int id)
-        {
-            return _context.Employees.Any(e => e.Id == id);
         }
     }
 }

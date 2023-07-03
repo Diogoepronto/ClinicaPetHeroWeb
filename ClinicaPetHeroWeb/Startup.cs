@@ -1,4 +1,5 @@
 using ClinicaPetHeroWeb.Data;
+using ClinicaPetHeroWeb.Data.Repos;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -29,6 +30,11 @@ namespace ClinicaPetHeroWeb
             {
                 cfg.UseSqlServer(this.Configuration.GetConnectionString("DefaultConnection"));
             });
+
+            services.AddScoped<IPetOwnerRepository, PetOwnerRepository>();
+            services.AddScoped<IAnimalRepository, AnimalRepository>();
+            services.AddScoped<IVeterinaryRepository, VeterinaryRepository>();
+            services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 
             services.AddControllersWithViews();
         }

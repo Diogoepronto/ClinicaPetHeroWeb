@@ -7,23 +7,34 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ClinicaPetHeroWeb.Data;
 using ClinicaPetHeroWeb.Data.Entities;
+using ClinicaPetHeroWeb.Data.Repos;
 
 namespace ClinicaPetHeroWeb.Controllers
 {
     public class PetOwnersController : Controller
     {
-        private readonly DataContext _context;
+        private readonly IPetOwnerRepository _petOwnerRepository;
 
-        public PetOwnersController(DataContext context)
+        public PetOwnersController(
+            IPetOwnerRepository petOwnerRepository)
         {
-            _context = context;
+            _petOwnerRepository = petOwnerRepository;
         }
+
+
+        // #######################################
+        // #                INDEX                #
+        // #######################################
 
         // GET: PetOwners
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return View(await _context.Owners.ToListAsync());
+            return View(_petOwnerRepository.GetAll().OrderBy(o => o.FirstName).ThenBy(o => o.LastName));
         }
+
+        // #########################################
+        // #                DETAILS                #
+        // #########################################
 
         // GET: PetOwners/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -33,8 +44,8 @@ namespace ClinicaPetHeroWeb.Controllers
                 return NotFound();
             }
 
-            var petOwner = await _context.Owners
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var petOwner = await _petOwnerRepository.GetByIdAsync(id.Value);
+
             if (petOwner == null)
             {
                 return NotFound();
@@ -42,6 +53,10 @@ namespace ClinicaPetHeroWeb.Controllers
 
             return View(petOwner);
         }
+
+        // ########################################
+        // #                CREATE                #
+        // ########################################
 
         // GET: PetOwners/Create
         public IActionResult Create()
@@ -54,16 +69,21 @@ namespace ClinicaPetHeroWeb.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,FirstName,LastName,Gender,DateOfBirth,Address,City,State,PostalCode,Email,Phone")] PetOwner petOwner)
+        public async Task<IActionResult> Create(PetOwner petOwner)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(petOwner);
-                await _context.SaveChangesAsync();
+                await _petOwnerRepository.CreateAsync(petOwner);
+
                 return RedirectToAction(nameof(Index));
             }
             return View(petOwner);
         }
+
+
+        // ######################################
+        // #                EDIT                #
+        // ######################################
 
         // GET: PetOwners/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -73,11 +93,13 @@ namespace ClinicaPetHeroWeb.Controllers
                 return NotFound();
             }
 
-            var petOwner = await _context.Owners.FindAsync(id);
+            var petOwner = await _petOwnerRepository.GetByIdAsync(id.Value);
+
             if (petOwner == null)
             {
                 return NotFound();
             }
+
             return View(petOwner);
         }
 
@@ -86,7 +108,7 @@ namespace ClinicaPetHeroWeb.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,FirstName,LastName,Gender,DateOfBirth,Address,City,State,PostalCode,Email,Phone")] PetOwner petOwner)
+        public async Task<IActionResult> Edit(int id, PetOwner petOwner)
         {
             if (id != petOwner.Id)
             {
@@ -97,12 +119,11 @@ namespace ClinicaPetHeroWeb.Controllers
             {
                 try
                 {
-                    _context.Update(petOwner);
-                    await _context.SaveChangesAsync();
+                    await _petOwnerRepository.UpdateAsync(petOwner);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!PetOwnerExists(petOwner.Id))
+                    if (! await _petOwnerRepository.ExistsAsync(petOwner.Id))
                     {
                         return NotFound();
                     }
@@ -116,6 +137,11 @@ namespace ClinicaPetHeroWeb.Controllers
             return View(petOwner);
         }
 
+
+        // ########################################
+        // #                DELETE                #
+        // ########################################
+
         // GET: PetOwners/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -124,8 +150,7 @@ namespace ClinicaPetHeroWeb.Controllers
                 return NotFound();
             }
 
-            var petOwner = await _context.Owners
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var petOwner = await _petOwnerRepository.GetByIdAsync(id.Value);
             if (petOwner == null)
             {
                 return NotFound();
@@ -139,15 +164,11 @@ namespace ClinicaPetHeroWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var petOwner = await _context.Owners.FindAsync(id);
-            _context.Owners.Remove(petOwner);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
+            var petOwner = await _petOwnerRepository.GetByIdAsync(id);
 
-        private bool PetOwnerExists(int id)
-        {
-            return _context.Owners.Any(e => e.Id == id);
+            await _petOwnerRepository.DeleteAsync(petOwner);
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }

@@ -7,23 +7,34 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ClinicaPetHeroWeb.Data;
 using ClinicaPetHeroWeb.Data.Entities;
+using ClinicaPetHeroWeb.Data.Repos;
 
 namespace ClinicaPetHeroWeb.Controllers
 {
     public class VeterinariesController : Controller
     {
-        private readonly DataContext _context;
+        private readonly IVeterinaryRepository _veterinaryRepository;
 
-        public VeterinariesController(DataContext context)
+        public VeterinariesController(IVeterinaryRepository veterinaryRepository)
         {
-            _context = context;
+            _veterinaryRepository = veterinaryRepository;
         }
+
+
+        // #######################################
+        // #                INDEX                #
+        // #######################################
 
         // GET: Veterinaries
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return View(await _context.Veterinaries.ToListAsync());
+            return View(_veterinaryRepository.GetAll().OrderBy(v => v.FirstName).ThenBy(o => o.LastName));
         }
+
+
+        // #########################################
+        // #                DETAILS                #
+        // #########################################
 
         // GET: Veterinaries/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -33,8 +44,8 @@ namespace ClinicaPetHeroWeb.Controllers
                 return NotFound();
             }
 
-            var veterinary = await _context.Veterinaries
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var veterinary = await _veterinaryRepository.GetByIdAsync(id.Value);
+
             if (veterinary == null)
             {
                 return NotFound();
@@ -42,6 +53,11 @@ namespace ClinicaPetHeroWeb.Controllers
 
             return View(veterinary);
         }
+
+
+        // ########################################
+        // #                CREATE                #
+        // ########################################
 
         // GET: Veterinaries/Create
         public IActionResult Create()
@@ -54,16 +70,22 @@ namespace ClinicaPetHeroWeb.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Specialty,Position,Id,FirstName,LastName,Gender,DateOfBirth,Address,City,State,PostalCode,Email,Phone")] Veterinary veterinary)
+        public async Task<IActionResult> Create(Veterinary veterinary)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(veterinary);
-                await _context.SaveChangesAsync();
+                await _veterinaryRepository.CreateAsync(veterinary);
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(veterinary);
         }
+
+
+        // ######################################
+        // #                EDIT                #
+        // ######################################
 
         // GET: Veterinaries/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -73,11 +95,13 @@ namespace ClinicaPetHeroWeb.Controllers
                 return NotFound();
             }
 
-            var veterinary = await _context.Veterinaries.FindAsync(id);
+            var veterinary = await _veterinaryRepository.GetByIdAsync(id.Value);
+
             if (veterinary == null)
             {
                 return NotFound();
             }
+
             return View(veterinary);
         }
 
@@ -86,7 +110,7 @@ namespace ClinicaPetHeroWeb.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Specialty,Position,Id,FirstName,LastName,Gender,DateOfBirth,Address,City,State,PostalCode,Email,Phone")] Veterinary veterinary)
+        public async Task<IActionResult> Edit(int id, Veterinary veterinary)
         {
             if (id != veterinary.Id)
             {
@@ -97,12 +121,11 @@ namespace ClinicaPetHeroWeb.Controllers
             {
                 try
                 {
-                    _context.Update(veterinary);
-                    await _context.SaveChangesAsync();
+                    await _veterinaryRepository.UpdateAsync(veterinary);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!VeterinaryExists(veterinary.Id))
+                    if (! await _veterinaryRepository.ExistsAsync(veterinary.Id))
                     {
                         return NotFound();
                     }
@@ -111,10 +134,17 @@ namespace ClinicaPetHeroWeb.Controllers
                         throw;
                     }
                 }
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(veterinary);
         }
+
+
+        // ########################################
+        // #                DELETE                #
+        // ########################################
 
         // GET: Veterinaries/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -124,8 +154,8 @@ namespace ClinicaPetHeroWeb.Controllers
                 return NotFound();
             }
 
-            var veterinary = await _context.Veterinaries
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var veterinary = await _veterinaryRepository.GetByIdAsync(id.Value);
+
             if (veterinary == null)
             {
                 return NotFound();
@@ -139,15 +169,11 @@ namespace ClinicaPetHeroWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var veterinary = await _context.Veterinaries.FindAsync(id);
-            _context.Veterinaries.Remove(veterinary);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
+            var veterinary = await _veterinaryRepository.GetByIdAsync(id);
 
-        private bool VeterinaryExists(int id)
-        {
-            return _context.Veterinaries.Any(e => e.Id == id);
+            await _veterinaryRepository.DeleteAsync(veterinary);
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }

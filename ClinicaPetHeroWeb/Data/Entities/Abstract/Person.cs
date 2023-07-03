@@ -47,5 +47,9 @@ namespace ClinicaPetHeroWeb.Data.Entities.Abstract
 
 
         public User User { get; set; }
+
+
+        [Display(Name = "Full Name")]
+        public string FullName => $"{FirstName} {LastName}";
     }
 }

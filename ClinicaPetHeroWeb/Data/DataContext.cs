@@ -11,7 +11,7 @@ namespace ClinicaPetHeroWeb.Data
         }
 
         public DbSet<Appointment> Appointments { get; set; }
-        public DbSet<PetOwner> Owners { get; set; }
+        public DbSet<PetOwner> PetOwners { get; set; }
         public DbSet<Animal> Animals { get; set; }
         public DbSet<Veterinary> Veterinaries { get; set; }
         public DbSet<Employee> Employees { get; set; }

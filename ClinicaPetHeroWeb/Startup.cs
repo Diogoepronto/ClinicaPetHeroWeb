@@ -31,6 +31,8 @@ namespace ClinicaPetHeroWeb
                 cfg.UseSqlServer(this.Configuration.GetConnectionString("DefaultConnection"));
             });
 
+            services.AddTransient<SeedDb>();
+
             services.AddScoped<IPetOwnerRepository, PetOwnerRepository>();
             services.AddScoped<IAnimalRepository, AnimalRepository>();
             services.AddScoped<IVeterinaryRepository, VeterinaryRepository>();

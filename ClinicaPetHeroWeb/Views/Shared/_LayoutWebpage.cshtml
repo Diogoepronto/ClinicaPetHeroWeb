@@ -1,0 +1,199 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- Basic -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- Mobile Metas -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <!-- Site Metas -->
+    <meta name="keywords" content="" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <link rel="shortcut icon" href="~/lib/favicon.ico" type="image/x-icon">
+
+    <title>Piuse</title>
+
+    <!-- bootstrap core css -->
+    <link rel="stylesheet" type="text/css" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <!-- slider stylesheet -->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+
+
+    <!-- Custom styles for this template -->
+    <link href="~/css/style.css" rel="stylesheet" />
+    <!-- responsive style -->
+    <link href="~/css/responsive.css" rel="stylesheet" />
+</head>
+
+<body>
+
+    <!-- header section strats -->
+    <header class="header_section">
+        <div class="container-fluid">
+            <nav class="navbar navbar-expand-lg custom_nav-container">
+                <a class="navbar-brand d-flex flex-row gap-3 h-100" asp-area="" asp-controller="Home" asp-action="Index">
+                    <img class="h-75" src="~/images/logo.png" />
+                    <span>
+                        Pet Hero
+                    </span>
+                </a>
+                <div class="" id="">
+                    <div class="User_option">
+                        <a class="btn btn-outline-dark " asp-area="" asp-controller="Home" asp-action="Dashboard"> 
+                            <i class="fa fa-gear" aria-hidden="true"></i> 
+                            Management
+                        </a>
+
+                        <a class="btn my-sm-0"> 
+                            <i class="fa fa-user" aria-hidden="true"></i> 
+                            Login
+                        </a>
+                    </div>
+
+                    <div class="custom_menu-btn">
+                        <button onclick="openNav()">
+                            <span class="s-1"> </span>
+                            <span class="s-2"> </span>
+                            <span class="s-3"> </span>
+                        </button>
+                    </div>
+                    <div id="myNav" class="overlay">
+                        <div class="overlay-content">
+                            <a href="#">Home</a>
+                            <a href="#">About</a>
+                            <a href="#">Service</a>
+                            <a href="#">Contact</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+    <!-- end header section -->
+
+    <main role="main" class="pb-3">
+        @RenderBody()
+    </main>
+
+    <!-- info section -->
+
+    <section class="info_section layout_padding2">
+        <div class="info_container ">
+            <div class="container">
+                <div class="row">
+
+                    <div class="col-md-6 col-lg-3 ">
+                        <div style="height:180px;">
+                            <img class="h-100" src="~/images/logo.png" style="filter:invert();"/>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-lg-3 ">
+                        <h6>
+                            About
+                        </h6>
+                        <p>
+                            There are many variations of passages of Lorem Ipsum available, but the majority havThere are many variations of passages of Lorem Ipsum available, but the majority hav
+                        </p>
+                    </div>
+                    <div class="col-md-6 col-lg-3 ">
+                        <h6>
+                            Useful Link
+                        </h6>
+                        <div class="info_link-box">
+                            <ul>
+                                <li class="active">
+                                    <a href="index.html">
+                                        Home
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="about.html">
+                                        About
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="service.html">
+                                        Service
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="contact.html">
+                                        Contact
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3 ">
+                        <h6>
+                            Address
+                        </h6>
+                        <div class="contact_items">
+                            <a href="">
+                                <div class="item ">
+                                    <div class="img-box ">
+                                        <i class="fa fa-map-marker" aria-hidden="true"></i>
+                                    </div>
+                                    <div class="detail-box">
+                                        <p>
+                                            Location
+                                        </p>
+                                    </div>
+                                </div>
+                            </a>
+                            <a href="">
+                                <div class="item ">
+                                    <div class="img-box ">
+                                        <i class="fa fa-phone" aria-hidden="true"></i>
+                                    </div>
+                                    <div class="detail-box">
+                                        <p>
+                                            Call +01 1234567890
+                                        </p>
+                                    </div>
+                                </div>
+                            </a>
+                            <a href="">
+                                <div class="item ">
+                                    <div class="img-box ">
+                                        <i class="fa fa-envelope" aria-hidden="true"></i>
+                                    </div>
+                                    <div class="detail-box">
+                                        <p>
+                                            demo@gmail.com
+                                        </p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- end info section -->
+    <!-- footer section -->
+    <footer class="container-fluid footer_section ">
+        <p>
+            &copy; <span id="displayDate"></span> All Rights Reserved. Design by
+            <a href="https://html.design/">Free Html Templates</a>
+        </p>
+    </footer>
+    <!-- end  footer section -->
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+    <!-- End Google Map -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js">
+    </script>
+    <script src="~/js/custom.js"></script>
+    <!-- Google Map -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCh39n5U-4IoWpsVGUHWdqB6puEkhRLdmI&callback=myMap"></script>
+</body>
+
+</html>

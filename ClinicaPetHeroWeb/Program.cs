@@ -29,7 +29,7 @@ namespace ClinicaPetHeroWeb
                 seeder.SeedAsync().Wait();
             }
         }
-
+        
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>

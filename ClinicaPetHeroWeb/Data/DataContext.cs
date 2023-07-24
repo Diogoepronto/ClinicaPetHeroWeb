@@ -1,13 +1,13 @@
 ﻿using ClinicaPetHeroWeb.Data.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClinicaPetHeroWeb.Data
 {
-    public class DataContext : DbContext
+    public class DataContext : IdentityDbContext
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options)
-        {
-            
+        {            
         }
 
         public DbSet<Appointment> Appointments { get; set; }

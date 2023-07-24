@@ -1,4 +1,7 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using ClinicaPetHeroWeb.Data.Entities;
+using ClinicaPetHeroWeb.Helpers;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -9,17 +12,63 @@ namespace ClinicaPetHeroWeb.Data
     public class SeedDb
     {
         private readonly DataContext _context;
+        private readonly IUserHelper _userHelper;
 
-        public SeedDb(DataContext context)
+        public SeedDb(
+            DataContext context, 
+            IUserHelper userHelper)
         {
             _context = context;
+            _userHelper = userHelper;
         }
+
 
         public async Task SeedAsync()
         {
             await _context.Database.MigrateAsync();
 
-            if(!_context.PetOwners.Any())
+            
+            // Create roles
+            await _userHelper.CreateRoleIfNotExistAsync("Admin");
+            await _userHelper.CreateRoleIfNotExistAsync("Employee");
+            await _userHelper.CreateRoleIfNotExistAsync("PetOwner");
+
+
+            // Create default user
+            var user = await _userHelper.GetUserByEmailAsync("bta.diogo@gmail.com");
+
+            if (user == null)
+            {
+                user = new User
+                {
+                    FirstName = "Diogo",
+                    LastName = "Alves",
+                    Email = "bta.diogo@gmail.com",
+                    UserName = "bta.diogo@gmail.com",
+                    PhoneNumber = "1234567890"
+                };
+
+                var result = await _userHelper.AddUserAsync(user, "123456");
+
+                if (result != IdentityResult.Success)
+                {
+                    throw new InvalidOperationException("Could not create the user in seeder");
+                }
+
+                await _userHelper.AddUserToRoleAsync(user, "Admin");
+            }
+
+            var isInRole = await _userHelper.IsUserInRoleAsync(user, "Admin");
+
+            if (!isInRole)
+            {
+                await _userHelper.AddUserToRoleAsync(user, "Admin");
+            }
+
+
+            // Create mock data
+
+            if (!_context.PetOwners.Any())
             {
                 AddPetOwner("Diogo", "Alves", "M", new DateTime(), "Rua qualquer 12", "Viseu", "Viseu", "3215-152", "bta.diogo@gmail.com", "912351846");
                 AddPetOwner("Julio", "Moreira", "M", new DateTime(), "Rua sem saída 19", "Lisboa", "Lisboa", "4355-189", "jumo@gmail.com", "963852741");

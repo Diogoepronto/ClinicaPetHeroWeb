@@ -1,5 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Poppins:wght@400;500;600;700&display=swap");
-@import url("font-awesome.min.css");
+
 body {
   font-family: 'Poppins', sans-serif;
   color: #000000;
@@ -198,7 +198,7 @@ a:focus {
       -ms-flex-align: center;
           align-items: center;
   margin-left: auto;
-  margin-right: 75px;
+  margin-right: 55px;
 }
 
 .User_option .form-inline {

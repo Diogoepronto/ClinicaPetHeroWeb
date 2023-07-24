@@ -1,0 +1,64 @@
+﻿@model ClinicaPetHeroWeb.Models.RegisterNewUserViewModel
+@{
+    ViewData["Title"] = "New User";
+    Layout = "~/Views/Shared/_LayoutWebpage.cshtml";
+
+}
+
+<section class="slider_section" style="padding: 75px;">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-sm-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">New User</h5>
+
+                    <form method="post" class="row g-3">
+                        <div asp-validation-summary="ModelOnly"></div>
+
+                        <div class="col-12">
+                            <label class="form-label" asp-for="FirstName">First Name</label>
+                            <input class="form-control" asp-for="FirstName" />
+                            <span class="text-warning" asp-validation-for="FirstName"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label" asp-for="LastName">Last Name</label>
+                            <input class="form-control" asp-for="LastName" />
+                            <span class="text-warning" asp-validation-for="LastName"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label" asp-for="Username">Username</label>
+                            <input class="form-control" asp-for="Username" />
+                            <span class="text-warning" asp-validation-for="Username"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label" asp-for="Password">Password</label>
+                            <input class="form-control" asp-for="Password" type="password" />
+                            <span class="text-warning" asp-validation-for="Password"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label" asp-for="ConfirmPassword">Confirm</label>
+                            <input class="form-control" asp-for="ConfirmPassword" type="password" />
+                            <span class="text-warning" asp-validation-for="ConfirmPassword"></span>
+                        </div>
+
+                        <div class="text-center">
+                            <input class="btn btn-primary" type="submit" value="Register New User" />
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    }
+

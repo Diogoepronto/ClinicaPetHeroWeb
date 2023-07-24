@@ -1,0 +1,47 @@
+﻿@model ClinicaPetHeroWeb.Models.LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+    Layout = "~/Views/Shared/_LayoutWebpage.cshtml";
+}
+
+<section class="slider_section" style="padding: 75px;">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-sm-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Login</h5>
+                    <form method="post" class="row g-3">
+                        <div asp-validation-summary="ModelOnly"></div>
+                        <div class="col-12">
+                            <label class="form-label" asp-for="UserName">Username</label>
+                            <input class="form-control" asp-for="UserName" class="form-control" />
+                            <span asp-validation-for="UserName" class="text-warning"></span>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" asp-for="Password">Password</label>
+                            <input class="form-control" asp-for="Password" type="password" class="form-control" />
+                            <span asp-validation-for="Password" class="text-warning"></span>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input asp-for="RememberMe" type="checkbox" class="form-check-input" />
+                                <label asp-for="RememberMe" class="form-check-label">Remember Me?</label>
+                            </div>
+                            <span asp-validation-for="RememberMe" class="text-warning"></span>
+                        </div>
+                        <div class="text-center">
+                            <input class="btn btn-primary" type="submit" value="Login" />
+                            <a class="btn btn-secondary" asp-action="Register">Register New User</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

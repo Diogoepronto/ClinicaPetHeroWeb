@@ -8,17 +8,25 @@ using Microsoft.EntityFrameworkCore;
 using ClinicaPetHeroWeb.Data;
 using ClinicaPetHeroWeb.Data.Entities;
 using ClinicaPetHeroWeb.Data.Repos;
+using ClinicaPetHeroWeb.Models.Entities;
+using ClinicaPetHeroWeb.Helpers;
 
 namespace ClinicaPetHeroWeb.Controllers
 {
     public class PetOwnersController : Controller
     {
         private readonly IPetOwnerRepository _petOwnerRepository;
+        private readonly IImageHelper _imageHelper;
+        private readonly IConverterHelper _converterHelper;
 
         public PetOwnersController(
-            IPetOwnerRepository petOwnerRepository)
+            IPetOwnerRepository petOwnerRepository,
+            IImageHelper imageHelper,
+            IConverterHelper converterHelper)
         {
             _petOwnerRepository = petOwnerRepository;
+            _imageHelper = imageHelper;
+            _converterHelper = converterHelper;
         }
 
 
@@ -69,15 +77,25 @@ namespace ClinicaPetHeroWeb.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(PetOwner petOwner)
+        public async Task<IActionResult> Create(PetOwnerViewModel model)
         {
             if (ModelState.IsValid)
             {
+                var imagePath = string.Empty;
+
+                if(model.ImageFile != null && model. ImageFile.Length > 0)
+                {
+                    imagePath = await _imageHelper.UploadImageAsync(model.ImageFile, "petowners");
+                }
+
+                var petOwner = _converterHelper.ToPetOwner(model, imagePath, true);
+
                 await _petOwnerRepository.CreateAsync(petOwner);
 
                 return RedirectToAction(nameof(Index));
             }
-            return View(petOwner);
+
+            return View(model);
         }
 
 
@@ -100,7 +118,9 @@ namespace ClinicaPetHeroWeb.Controllers
                 return NotFound();
             }
 
-            return View(petOwner);
+            var model = _converterHelper.ToPetOwnerViewModel(petOwner);
+
+            return View(model);
         }
 
         // POST: PetOwners/Edit/5
@@ -108,22 +128,26 @@ namespace ClinicaPetHeroWeb.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, PetOwner petOwner)
+        public async Task<IActionResult> Edit(PetOwnerViewModel model)
         {
-            if (id != petOwner.Id)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
                 try
                 {
+                    var imagePath = model.ProfileImageUrl;
+
+                    if(model.ImageFile != null && model.ImageFile.Length > 0)
+                    {
+                        imagePath = await _imageHelper.UploadImageAsync(model.ImageFile, "petowners");
+                    }
+
+                    var petOwner = _converterHelper.ToPetOwner(model, imagePath, false);
+
                     await _petOwnerRepository.UpdateAsync(petOwner);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (! await _petOwnerRepository.ExistsAsync(petOwner.Id))
+                    if (! await _petOwnerRepository.ExistsAsync(model.Id))
                     {
                         return NotFound();
                     }
@@ -134,7 +158,8 @@ namespace ClinicaPetHeroWeb.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(petOwner);
+
+            return View(model);
         }
 
 

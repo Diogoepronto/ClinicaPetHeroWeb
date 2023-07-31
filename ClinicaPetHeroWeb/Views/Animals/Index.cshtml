@@ -20,12 +20,18 @@
 
         <h5 class="card-title">Animals</h5>
         <p>
-            <a class="btn btn-primary" asp-action="Create">Create New</a>
+            <a class="btn btn-primary" asp-action="Create">
+                <i class="ri-add-line"></i>
+                Create New
+            </a>
         </p>
 
         <table class="table table-hover datatable">
             <thead>
                 <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.AnimalImageUrl)
+                    </th>
                     <th>
                         @Html.DisplayNameFor(model => model.Name)
                     </th>
@@ -51,6 +57,14 @@
                 @foreach (var item in Model)
                 {
                     <tr>
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.AnimalImageUrl))
+                            {
+                                <div class="rounded-circle overflow-hidden" style="max-height: 90px; max-width: 90px;">
+                                    <img src="@Url.Content(item.AnimalImageUrl)" alt="@item.Name's Picture" class="img-fluid" />
+                                </div>
+                            }
+                        </td>
                         <td>
                             @Html.DisplayFor(modelItem => item.Name)
                         </td>

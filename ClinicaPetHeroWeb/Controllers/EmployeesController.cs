@@ -8,16 +8,25 @@ using Microsoft.EntityFrameworkCore;
 using ClinicaPetHeroWeb.Data;
 using ClinicaPetHeroWeb.Data.Entities;
 using ClinicaPetHeroWeb.Data.Repos;
+using ClinicaPetHeroWeb.Helpers;
+using ClinicaPetHeroWeb.Models.Entities;
 
 namespace ClinicaPetHeroWeb.Controllers
 {
     public class EmployeesController : Controller
     {
         private readonly IEmployeeRepository _employeeRepository;
+        private readonly IImageHelper _imageHelper;
+        private readonly IConverterHelper _converterHelper;
 
-        public EmployeesController(IEmployeeRepository employeeRepository)
+        public EmployeesController(
+            IEmployeeRepository employeeRepository,
+            IImageHelper imageHelper,
+            IConverterHelper converterHelper)
         {
             _employeeRepository = employeeRepository;
+            _imageHelper = imageHelper;
+            _converterHelper = converterHelper;
         }
 
 
@@ -70,15 +79,25 @@ namespace ClinicaPetHeroWeb.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Employee employee)
+        public async Task<IActionResult> Create(EmployeeViewModel model)
         {
             if (ModelState.IsValid)
             {
+                var imagePath = string.Empty;
+
+                if (model.ImageFile != null && model.ImageFile.Length > 0)
+                {
+                    imagePath = await _imageHelper.UploadImageAsync(model.ImageFile, "employees");
+                }
+
+                var employee = _converterHelper.ToEmployee(model, imagePath, true);
+
                 await _employeeRepository.CreateAsync(employee);
 
                 return RedirectToAction(nameof(Index));
             }
-            return View(employee);
+
+            return View(model);
         }
 
 
@@ -101,7 +120,9 @@ namespace ClinicaPetHeroWeb.Controllers
                 return NotFound();
             }
 
-            return View(employee);
+            var model = _converterHelper.ToEmployeeViewModel(employee);
+
+            return View(model);
         }
 
         // POST: Employees/Edit/5
@@ -109,22 +130,26 @@ namespace ClinicaPetHeroWeb.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Employee employee)
+        public async Task<IActionResult> Edit(EmployeeViewModel model)
         {
-            if (id != employee.Id)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
                 try
                 {
+                    var imagePath = model.ProfileImageUrl;
+
+                    if (model.ImageFile != null && model.ImageFile.Length > 0)
+                    {
+                        imagePath = await _imageHelper.UploadImageAsync(model.ImageFile, "employees");
+                    }
+
+                    var employee = _converterHelper.ToEmployee(model, imagePath, false);
+
                     await _employeeRepository.UpdateAsync(employee);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (! await _employeeRepository.ExistsAsync(employee.Id))
+                    if (!await _employeeRepository.ExistsAsync(model.Id))
                     {
                         return NotFound();
                     }
@@ -133,11 +158,10 @@ namespace ClinicaPetHeroWeb.Controllers
                         throw;
                     }
                 }
-
                 return RedirectToAction(nameof(Index));
             }
 
-            return View(employee);
+            return View(model);
         }
 
 

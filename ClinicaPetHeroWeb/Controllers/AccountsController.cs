@@ -1,6 +1,6 @@
 ﻿using ClinicaPetHeroWeb.Data.Entities;
 using ClinicaPetHeroWeb.Helpers;
-using ClinicaPetHeroWeb.Models;
+using ClinicaPetHeroWeb.Models.Accounts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;

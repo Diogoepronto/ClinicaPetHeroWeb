@@ -8,19 +8,28 @@ using Microsoft.EntityFrameworkCore;
 using ClinicaPetHeroWeb.Data;
 using ClinicaPetHeroWeb.Data.Entities;
 using ClinicaPetHeroWeb.Data.Repos;
+using ClinicaPetHeroWeb.Helpers;
+using ClinicaPetHeroWeb.Models.Entities;
 
 namespace ClinicaPetHeroWeb.Controllers
 {
     public class AnimalsController : Controller
     {
         private readonly IAnimalRepository _animalRepository;
+        private readonly IConverterHelper _converterHelper;
+        private readonly IImageHelper _imageHelper;
 
-        public AnimalsController(IAnimalRepository animalRepository)
+        public AnimalsController(
+            IAnimalRepository animalRepository,
+            IConverterHelper converterHelper,
+            IImageHelper imageHelper)
         {
             _animalRepository = animalRepository;
+            _converterHelper = converterHelper;
+            _imageHelper = imageHelper;
         }
 
-        
+
         // #######################################
         // #                INDEX                #
         // #######################################
@@ -70,15 +79,25 @@ namespace ClinicaPetHeroWeb.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Animal animal)
+        public async Task<IActionResult> Create(AnimalViewModel model)
         {
             if (ModelState.IsValid)
             {
-                await _animalRepository.CreateAsync(animal);
+                var imagePath = string.Empty;
+
+                if (model.ImageFile != null && model.ImageFile.Length > 0)
+                {
+                    imagePath = await _imageHelper.UploadImageAsync(model.ImageFile, "animals");
+                }
+
+                var animal = _converterHelper.ToAnimal(model, imagePath, true);
+
+                await _animalRepository.CreateAsync(model);
 
                 return RedirectToAction(nameof(Index));
             }
-            return View(animal);
+
+            return View(model);
         }
 
 
@@ -101,7 +120,9 @@ namespace ClinicaPetHeroWeb.Controllers
                 return NotFound();
             }
 
-            return View(animal);
+            var model = _converterHelper.ToAnimalViewModel(animal);
+
+            return View(model);
         }
 
         // POST: Animals/Edit/5
@@ -109,22 +130,26 @@ namespace ClinicaPetHeroWeb.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Animal animal)
+        public async Task<IActionResult> Edit(AnimalViewModel model)
         {
-            if (id != animal.Id)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
                 try
                 {
+                    var imagePath = model.AnimalImageUrl;
+
+                    if(model.ImageFile != null && model.ImageFile.Length > 0)
+                    {
+                        imagePath = await _imageHelper.UploadImageAsync(model.ImageFile, "animals");
+                    }
+
+                    var animal = _converterHelper.ToAnimal(model, imagePath, false);
+
                     await _animalRepository.UpdateAsync(animal);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (! await _animalRepository.ExistsAsync(animal.Id))
+                    if (!await _animalRepository.ExistsAsync(model.Id))
                     {
                         return NotFound();
                     }
@@ -135,7 +160,7 @@ namespace ClinicaPetHeroWeb.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(animal);
+            return View(model);
         }
 
 

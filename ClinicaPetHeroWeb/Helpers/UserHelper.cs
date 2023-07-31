@@ -1,5 +1,5 @@
 ﻿using ClinicaPetHeroWeb.Data.Entities;
-using ClinicaPetHeroWeb.Models;
+using ClinicaPetHeroWeb.Models.Accounts;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 

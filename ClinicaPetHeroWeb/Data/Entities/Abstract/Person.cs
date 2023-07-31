@@ -48,8 +48,24 @@ namespace ClinicaPetHeroWeb.Data.Entities.Abstract
 
         public User User { get; set; }
 
+        [Display(Name = "Profile Picture")]
+        public string ProfileImageUrl { get; set; }
+
 
         [Display(Name = "Full Name")]
         public string FullName => $"{FirstName} {LastName}";
+
+
+        public string ProfileImageFullPath
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(ProfileImageUrl))
+                {
+                    return null;
+                }
+                return $"https://localhost:44336//{ProfileImageUrl.Substring(1)}";
+            }
+        }
     }
 }

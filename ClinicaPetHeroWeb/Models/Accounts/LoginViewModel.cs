@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ClinicaPetHeroWeb.Models
+namespace ClinicaPetHeroWeb.Models.Accounts
 {
     public class LoginViewModel
     {

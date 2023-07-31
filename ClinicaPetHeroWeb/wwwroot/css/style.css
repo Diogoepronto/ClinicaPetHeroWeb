@@ -100,7 +100,6 @@ p {
 }
 
 .header_section {
-    position: fixed;
     z-index: 10;
     width: 100%;
 }

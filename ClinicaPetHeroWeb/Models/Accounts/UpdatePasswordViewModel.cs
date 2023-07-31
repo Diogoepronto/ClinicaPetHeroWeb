@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Xml.Linq;
 
-namespace ClinicaPetHeroWeb.Models
+namespace ClinicaPetHeroWeb.Models.Accounts
 {
     public class UpdatePasswordViewModel
     {

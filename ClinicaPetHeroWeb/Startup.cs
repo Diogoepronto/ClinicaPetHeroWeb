@@ -48,9 +48,12 @@ namespace ClinicaPetHeroWeb
 
             services.AddTransient<SeedDb>();
 
+            // Helpers
             services.AddScoped<IUserHelper, UserHelper>();
+            services.AddScoped<IImageHelper, ImageHelper>();
+            services.AddScoped<IConverterHelper, ConverterHelper>();
 
-            // Repositórios
+            // Repositories
             services.AddScoped<IPetOwnerRepository, PetOwnerRepository>();
             services.AddScoped<IAnimalRepository, AnimalRepository>();
             services.AddScoped<IVeterinaryRepository, VeterinaryRepository>();
